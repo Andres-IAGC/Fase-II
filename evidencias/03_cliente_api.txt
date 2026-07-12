@@ -1,0 +1,58 @@
+
+==========================================================
+ GET /health
+==========================================================
+200 {"modelo_cargado": true, "status": "ok", "version": "1.0.0"}
+
+==========================================================
+ GET /metadata
+==========================================================
+200 {
+  "algoritmo": "RandomForestClassifier",
+  "clases": {
+    "0": "No readmitido",
+    "1": "Readmitido (alto riesgo)"
+  },
+  "metricas_test": {
+    "auc": 0.792,
+    "f1": 0.5779,
+    "recall": 0.7191
+  },
+  "umbral_operativo": 0.3,
+  "variables": [
+    "edad",
+    "num_diagnosticos",
+    "num_medicamentos",
+    "dias_estancia",
+    "visitas_urgencias_previas",
+    "nivel_glucosa",
+    "presion_arterial",
+    "indice_masa_corporal",
+    "num_procedimientos",
+    "hospitalizaciones_previas",
+    "indice_adherencia",
+    "num_comorbilidades"
+  ],
+  "version": "1.0.0"
+}
+
+==========================================================
+ POST /predict
+==========================================================
+
+[Paciente bajo riesgo] HTTP 200
+  -> No readmitido | prob. readmision = 0.0363
+
+[Paciente riesgo medio] HTTP 200
+  -> Readmitido (alto riesgo) | prob. readmision = 0.479
+
+[Paciente alto riesgo] HTTP 200
+  -> Readmitido (alto riesgo) | prob. readmision = 0.8922
+
+[Caso extremo (maximos)] HTTP 200
+  -> Readmitido (alto riesgo) | prob. readmision = 0.7592
+
+==========================================================
+ POST /predict (caso invalido)
+==========================================================
+400 {"error": "Se esperaban exactamente 12 variables numericas."}

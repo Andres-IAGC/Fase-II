@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Artefacto del modelo (se regenera con entrenar_modelo.py o en el build)
+model.pkl
+
+# Sistema
+.DS_Store
+Thumbs.db

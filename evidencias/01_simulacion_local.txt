@@ -1,0 +1,61 @@
+============================================================
+ SIMULACION LOCAL - Modelo de readmision hospitalaria
+ Version: 1.0.0 | Algoritmo: RandomForestClassifier | Umbral: 0.3
+============================================================
+
+------------------------------------------------------------
+ 1) CASOS COMUNES / ESPERADOS
+------------------------------------------------------------
+
+> Paciente joven, buena adherencia (bajo riesgo esperado)
+  Entrada: [45, 2, 3, 1, 0, 100, 115, 23, 0, 0, 0.95, 0]
+  Prediccion: 0 (No readmitido)
+  Probabilidades (no readmision, readmision): [0.9637, 0.0363]
+
+> Paciente cronico moderado (riesgo medio esperado)
+  Entrada: [79, 11, 14, 12, 5, 260, 175, 38, 6, 5, 0.2, 7]
+  Prediccion: 1 (Readmitido (alto riesgo))
+  Probabilidades (no readmision, readmision): [0.5210, 0.4790]
+
+> Paciente cronico severo (alto riesgo esperado)
+  Entrada: [90, 15, 22, 24, 9, 350, 205, 48, 10, 8, 0.1, 11]
+  Prediccion: 1 (Readmitido (alto riesgo))
+  Probabilidades (no readmision, readmision): [0.1078, 0.8922]
+
+------------------------------------------------------------
+ 2) CASOS EXTREMOS (LIMITE)
+------------------------------------------------------------
+
+> Minimos absolutos (paciente sano ideal)
+  Entrada: [18, 0, 0, 0, 0, 80, 100, 20, 0, 0, 1.0, 0]
+  Prediccion: 0 (No readmitido)
+  Probabilidades (no readmision, readmision): [0.9003, 0.0997]
+
+> Maximos absolutos (deterioro extremo)
+  Entrada: [95, 16, 25, 30, 12, 400, 220, 55, 12, 10, 0.0, 12]
+  Prediccion: 1 (Readmitido (alto riesgo))
+  Probabilidades (no readmision, readmision): [0.2408, 0.7592]
+
+> Caso frontera cercano al umbral
+  Entrada: [70, 8, 10, 7, 3, 200, 160, 33, 4, 3, 0.4, 5]
+  Prediccion: 0 (No readmitido)
+  Probabilidades (no readmision, readmision): [0.8854, 0.1146]
+
+------------------------------------------------------------
+ 3) VALIDACION BASICA (nivel de confianza y alertas)
+------------------------------------------------------------
+
+> Bajo riesgo
+  Entrada: [45, 2, 3, 1, 0, 100, 115, 23, 0, 0, 0.95, 0]
+  Prediccion: 0 (No readmitido)
+  Probabilidades (no readmision, readmision): [0.9637, 0.0363]
+
+> Alto riesgo
+  Entrada: [90, 15, 22, 24, 9, 350, 205, 48, 10, 8, 0.1, 11]
+  Prediccion: 1 (Readmitido (alto riesgo))
+  Probabilidades (no readmision, readmision): [0.1078, 0.8922]
+  [ALERTA] Probabilidad de readmision > 0.70 -> revision prioritaria
+
+============================================================
+ Simulacion finalizada. El modelo carga y responde correctamente.
+============================================================

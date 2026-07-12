@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Predictor de Readmision Hospitalaria - Fase II</title>
+  <style>
+    :root { --azul:#1b4f72; --azul2:#2e86c1; --gris:#f4f6f7; --ok:#1e8449; --alerta:#c0392b; }
+    * { box-sizing: border-box; }
+    body { font-family: "Segoe UI", Arial, sans-serif; margin:0; background:var(--gris); color:#212f3d; }
+    header { background:var(--azul); color:#fff; padding:22px 28px; }
+    header h1 { margin:0; font-size:1.35rem; }
+    header p  { margin:4px 0 0; opacity:.85; font-size:.9rem; }
+    main { max-width:920px; margin:24px auto; padding:0 18px; }
+    .card { background:#fff; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,.08); padding:22px; margin-bottom:22px; }
+    h2 { color:var(--azul); font-size:1.05rem; border-bottom:2px solid var(--azul2); padding-bottom:6px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:12px; }
+    label { display:block; font-size:.8rem; font-weight:600; margin-bottom:3px; }
+    input { width:100%; padding:8px; border:1px solid #ccd; border-radius:6px; }
+    .botones { margin-top:18px; display:flex; gap:10px; flex-wrap:wrap; }
+    button { border:none; border-radius:6px; padding:10px 18px; font-size:.9rem; cursor:pointer; font-weight:600; }
+    .primario { background:var(--azul2); color:#fff; }
+    .sec { background:#eaeded; color:#212f3d; }
+    #resultado { display:none; margin-top:18px; padding:16px; border-radius:8px; font-size:.95rem; }
+    .r-ok    { background:#eafaf1; border-left:6px solid var(--ok); }
+    .r-alerta{ background:#fdedec; border-left:6px solid var(--alerta); }
+    .barra { height:14px; background:#e5e8e8; border-radius:7px; overflow:hidden; margin-top:8px; }
+    .barra > div { height:100%; background:var(--alerta); }
+    footer { text-align:center; font-size:.8rem; color:#7f8c8d; padding:20px; }
+    code { background:#eef; padding:1px 5px; border-radius:4px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Predictor de Readmision Hospitalaria a 30 dias</h1>
+    <p>Fase II &middot; Gestion de Proyectos de IA &middot; Frontend integrado con API REST (umbral operativo {{ umbral }})</p>
+  </header>
+
+  <main>
+    <div class="card">
+      <h2>Variables clinicas del paciente</h2>
+      <form id="form">
+        <div class="grid">
+          {% for f in features %}
+          <div>
+            <label for="{{ f }}">{{ f.replace('_',' ')|capitalize }}</label>
+            <input type="number" step="any" id="{{ f }}" name="{{ f }}" required>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="botones">
+          <button type="submit" class="primario">Predecir readmision</button>
+          <button type="button" class="sec" onclick="cargar('bajo_riesgo')">Ejemplo bajo riesgo</button>
+          <button type="button" class="sec" onclick="cargar('riesgo_medio')">Ejemplo riesgo medio</button>
+          <button type="button" class="sec" onclick="cargar('alto_riesgo')">Ejemplo alto riesgo</button>
+        </div>
+      </form>
+
+      <div id="resultado"></div>
+    </div>
+
+    <div class="card">
+      <h2>Consumo de la API</h2>
+      <p>Endpoint: <code>POST /predict</code> &middot; salud: <code>GET /health</code> &middot; metadatos: <code>GET /metadata</code></p>
+    </div>
+  </main>
+
+  <footer>Solucion contenerizable con Docker &middot; JUAN ANDRES GUTIERREZ MARTINEZ</footer>
+
+  <script>
+    const FEATURES = {{ features|tojson }};
+    const EJEMPLOS = {{ ejemplos|tojson }};
+
+    function cargar(clave) {
+      const v = EJEMPLOS[clave];
+      FEATURES.forEach((f, i) => document.getElementById(f).value = v[i]);
+    }
+
+    document.getElementById('form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const features = FEATURES.map(f => parseFloat(document.getElementById(f).value));
+      const box = document.getElementById('resultado');
+      try {
+        const resp = await fetch('/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ features })
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'Error');
+        const fraude = data.prediccion === 1;
+        const pct = (data.probabilidad_readmision * 100).toFixed(1);
+        box.className = fraude ? 'r-alerta' : 'r-ok';
+        box.style.display = 'block';
+        box.innerHTML =
+          '<strong>Prediccion: ' + data.etiqueta + '</strong>' +
+          '<div>Probabilidad de readmision: <b>' + pct + '%</b> ' +
+          '(umbral ' + (data.umbral_aplicado*100) + '%)</div>' +
+          '<div class="barra"><div style="width:' + pct + '%"></div></div>';
+      } catch (err) {
+        box.className = 'r-alerta';
+        box.style.display = 'block';
+        box.textContent = 'Error: ' + err.message;
+      }
+    });
+  </script>
+</body>
+</html>
