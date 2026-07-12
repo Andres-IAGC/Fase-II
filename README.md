@@ -117,11 +117,17 @@ Frontend disponible en `http://localhost:5000`.
 
 ---
 
-## 5. Despliegue en la nube
+> **Verificado:** la imagen `readmision-api:1.0.0` (699 MB) se construyó con
+> Docker 29.6.1 y el contenedor se ejecutó con estado `healthy`, sirviendo el
+> frontend y respondiendo a los endpoints. Evidencia en
+> [`evidencias/`](evidencias/) (`05_evidencia_docker.txt`, `06_frontend_docker.png`).
 
-Consulta el **Manual de despliegue en la nube** (documento Word/PDF entregable)
-para el procedimiento paso a paso en un modelo **PaaS** (Render / Azure App
-Service / Google Cloud Run) a partir de esta imagen Docker.
+## 5. Despliegue en la nube y documentación
+
+Consulta el **Manual de despliegue en la nube** y el **Documento de validación y
+pruebas** en la carpeta [`docs/`](docs/) (PDF y Word) para el procedimiento paso a
+paso en un modelo **PaaS** (Render / Azure App Service / Google Cloud Run) a partir
+de esta imagen Docker, y el detalle completo de las pruebas realizadas.
 
 ---
 

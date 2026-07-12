@@ -1,0 +1,42 @@
+============================================================
+ EVIDENCIA DE CONTENEDOR DOCKER FUNCIONAL - Fase II
+ Fecha: 2026-07-12 15:15
+============================================================
+
+### docker --version
+Docker version 29.6.1, build 8900f1d
+
+### docker images readmision-api  (IMAGEN CONSTRUIDA CORRECTAMENTE)
+readmision-api:1.0.0   ID=fa411b1f1376   Size=699MB
+
+### docker ps  (CONTENEDOR EN EJECUCION)
+readmision-api | readmision-api:1.0.0 | Up 2 minutes (healthy) | 0.0.0.0:5000->5000/tcp, [::]:5000->5000/tcp
+
+### Healthcheck nativo del contenedor
+Estado de salud: healthy
+
+### GET /health
+{"modelo_cargado":true,"status":"ok","version":"1.0.0"}
+
+
+### GET /metadata
+{"algoritmo":"RandomForestClassifier","clases":{"0":"No readmitido","1":"Readmitido (alto riesgo)"},"metricas_test":{"auc":0.792,"f1":0.5779,"recall":0.7191},"umbral_operativo":0.3,"variables":["edad","num_diagnosticos","num_medicamentos","dias_estancia","visitas_urgencias_previas","nivel_glucosa","presion_arterial","indice_masa_corporal","num_procedimientos","hospitalizaciones_previas","indice_adherencia","num_comorbilidades"],"version":"1.0.0"}
+
+
+### POST /predict  - Caso bajo riesgo  [45,2,3,1,0,100,115,23,0,0,0.95,0]
+{"etiqueta":"No readmitido","prediccion":0,"probabilidad_no_readmision":0.9637,"probabilidad_readmision":0.0363,"umbral_aplicado":0.3,"variables_recibidas":{"dias_estancia":1.0,"edad":45.0,"hospitalizaciones_previas":0.0,"indice_adherencia":0.95,"indice_masa_corporal":23.0,"nivel_glucosa":100.0,"num_comorbilidades":0.0,"num_diagnosticos":2.0,"num_medicamentos":3.0,"num_procedimientos":0.0,"presion_arterial":115.0,"visitas_urgencias_previas":0.0}}
+
+
+### POST /predict  - Caso alto riesgo  [90,15,22,24,9,350,205,48,10,8,0.1,11]
+{"etiqueta":"Readmitido (alto riesgo)","prediccion":1,"probabilidad_no_readmision":0.1078,"probabilidad_readmision":0.8922,"umbral_aplicado":0.3,"variables_recibidas":{"dias_estancia":24.0,"edad":90.0,"hospitalizaciones_previas":8.0,"indice_adherencia":0.1,"indice_masa_corporal":48.0,"nivel_glucosa":350.0,"num_comorbilidades":11.0,"num_diagnosticos":15.0,"num_medicamentos":22.0,"num_procedimientos":10.0,"presion_arterial":205.0,"visitas_urgencias_previas":9.0}}
+
+
+### POST /predict  - Entrada invalida (validacion, HTTP 400 esperado)
+HTTP 400 - {"error":"Se esperaban exactamente 12 variables numericas."}
+
+### Ultimas lineas del log del contenedor (gunicorn)
+[2026-07-12 22:13:10 +0000] [1] [INFO] Starting gunicorn 23.0.0
+[2026-07-12 22:13:10 +0000] [1] [INFO] Listening at: http://0.0.0.0:5000 (1)
+[2026-07-12 22:13:10 +0000] [1] [INFO] Using worker: sync
+[2026-07-12 22:13:10 +0000] [7] [INFO] Booting worker with pid: 7
+[2026-07-12 22:13:10 +0000] [23] [INFO] Booting worker with pid: 23
